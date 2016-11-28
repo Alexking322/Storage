@@ -78,4 +78,14 @@ public class RAM {
 			return false;
 		}
 	}
+
+	public String list(String[] data) {
+				if (currentStorage != null) {
+		 	return currentStorage.list(data);
+		 			}
+		 	else {
+		 		return null;
+		 		}
+		 	}
 }
+

@@ -1,12 +1,13 @@
 package com.spoloborota.teaching.storage.processor;
 
+
 import com.spoloborota.teaching.storage.commands.Commands;
 import com.spoloborota.teaching.storage.model.RAM;
 import com.spoloborota.teaching.storage.processor.type.Add;
 import com.spoloborota.teaching.storage.processor.type.Create;
 import com.spoloborota.teaching.storage.processor.type.Display;
 import com.spoloborota.teaching.storage.processor.type.Use;
-
+import com.spoloborota.teaching.storage.processor.type.List;
 /**
  * process commands
  * @author Spoloborota
@@ -52,6 +53,15 @@ public class Processor {
 					result = Add.process(ram, commandWords);					
 				} else {
 					result = "Data for storage does not specified correctly";
+				}
+				break;
+				
+			case Commands.LIST:
+				if (ram.currentStorage != null){
+					result = List.process(ram, commandWords) + "\n" + "Data listed" + "\n";					
+				}
+				else{
+					result = "There is no selected storage";
 				}
 				break;
 				
