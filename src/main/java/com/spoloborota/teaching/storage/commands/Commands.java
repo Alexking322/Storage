@@ -5,6 +5,9 @@ public interface Commands {
 	public final static String CREATE = "create";
 	public final static String USE = "use";
 	public final static String SHUTDOWN = "shutdown";
+	public final static String YES = "y";
+	public final static String NO = "n";
+	public final static String SAVE = "save";
 	
 	public final static String MAP = "map";
 	public final static String LIST = "list";

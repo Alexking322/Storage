@@ -3,6 +3,7 @@ package com.spoloborota.teaching.storage.model;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.spoloborota.teaching.storage.type.FilesLoader;
 import com.spoloborota.teaching.storage.type.MapStorage;
 
 /**
@@ -11,11 +12,22 @@ import com.spoloborota.teaching.storage.type.MapStorage;
  *
  */
 public class RAM {
+	String path;
+	FilesLoader filesloader;
+
 	public Map<String, MapStorage> map;
 	public MapStorage currentStorage = null;
 	
 	public RAM() {
 		map = new HashMap<>();
+	}
+	public RAM(String path) {
+
+		map = new HashMap<>();
+		this.path = path;
+
+		filesloader = new FilesLoader(this.path);
+		load();
 	}
 	
 	/**
@@ -79,12 +91,58 @@ public class RAM {
 		}
 	}
 
+	public String save(){
+		String buffer = "";
+		String outString = "";
+		boolean savedFlag = false;
+		if (currentStorage != null) {
+			buffer = currentStorage.getDataToSave();
+			savedFlag = filesloader.save(currentStorage.name, buffer);
+
+			if (savedFlag){
+				outString = "Data from the current storage " + currentStorage.name 
+						+ " Save file " + path 
+						+ "\\" 
+						+ currentStorage.name +  ".storage";
+			}
+			else{
+				outString = "Invalid path. Restart the program and specify the path to directory.";
+			}
+			return outString;
+		} 
+		else {
+			return null;
+		}
+	}
+
+	private void load(){
+		String [] listOfStorages;
+		String [] buffer;
+		String [] toAdd = new String[2];
+
+		if (filesloader.isDirectoryOrNot()){
+			listOfStorages = filesloader.getlistOfStorages();
+			for (int i = 0 ; i<listOfStorages.length;i++){
+				create(listOfStorages[i]);
+				filesloader.load((listOfStorages[i]));
+				buffer = filesloader.getloadedData();
+				use(listOfStorages[i]);
+				for (int j = 0; j< buffer.length; j+=2){
+					toAdd[0] = buffer[j];
+					toAdd[1] = buffer[j+1];				
+					add(toAdd);
+				}				
+			}
+			currentStorage = null;
+		}
+	}
+
 	public String list(String[] data) {
 				if (currentStorage != null) {
-		 	return currentStorage.list(data);
+		 	return currentStorage.hashMap.entrySet().toString();
 		 			}
 		 	else {
-		 		return null;
+		 		return "Please select the Storage";
 		 		}
 		 	}
 }

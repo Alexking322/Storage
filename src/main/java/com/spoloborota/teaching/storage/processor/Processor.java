@@ -2,7 +2,10 @@ package com.spoloborota.teaching.storage.processor;
 
 
 import com.spoloborota.teaching.storage.commands.Commands;
+
 import com.spoloborota.teaching.storage.model.RAM;
+import com.spoloborota.teaching.storage.processor.type.Save;
+import com.spoloborota.teaching.storage.processor.type.Shutdown;
 import com.spoloborota.teaching.storage.processor.type.Add;
 import com.spoloborota.teaching.storage.processor.type.Create;
 import com.spoloborota.teaching.storage.processor.type.Display;
@@ -15,9 +18,11 @@ import com.spoloborota.teaching.storage.processor.type.List;
  */
 public class Processor {
 	public RAM ram;
+	private Shutdown shutdown;
 	
 	public Processor(RAM ram) {
 		this.ram = ram;
+		shutdown = new Shutdown();
 	}
 	public String process(String commandString) {
 		String[] commandWords = commandString.trim().split("\\s+");
@@ -29,30 +34,79 @@ public class Processor {
 			String result = "";
 			switch (commandWords[0]) {
 			case Commands.DISPLAY:
-				result = Display.process(ram);
+				if (!shutdown.getShutdownFlag()){
+					result = Display.process(ram);
+				}
+				else{
+					result = shutdown.getSaveYesNoMessage();
+				}
 				break;
-		
+
 			case Commands.USE:
-				if (commandWords.length > 1) {
-					result = Use.process(ram, commandWords);
-				} else {
-					result = "Storage name does not specified";
+				if (!shutdown.getShutdownFlag()){
+					if (commandWords.length > 1) {
+						result = Use.process(ram, commandWords);
+					} else {
+						result = "Storage name does not specified";
+					}
+				}
+				else{
+					result = shutdown.getSaveYesNoMessage();
 				}
 				break;
 				
 			case Commands.CREATE:
-				if (commandWords.length > 1) {
-					result = Create.process(ram, commandWords);
-				} else {
-					result = "Storage name does not specified";
+				if (!shutdown.getShutdownFlag()){
+					if (commandWords.length > 1) {
+						result = Create.process(ram, commandWords);
+					} else {
+						result = "Storage name does not specified";
+					}
+				}
+				else{
+					result = shutdown.getSaveYesNoMessage();
 				}
 				break;
 				
 			case Commands.ADD:
-				if (commandWords.length > 2) {
-					result = Add.process(ram, commandWords);					
-				} else {
-					result = "Data for storage does not specified correctly";
+				if (!shutdown.getShutdownFlag()){
+					if (commandWords.length > 2) {
+						result = Add.process(ram, commandWords);					
+					} else {
+						result = "Data for storage does not specified correctly";
+					}
+				}
+				else{
+					result = shutdown.getSaveYesNoMessage();
+				}
+				break;
+
+			case Commands.SAVE:
+				if (!shutdown.getShutdownFlag()){
+					result = Save.process(ram);					
+				}
+				else{
+					if(shutdown.getShutdownSaveFlag()){
+						result = Save.process(ram);
+					}
+					else{
+						result = shutdown.getSaveYesNoMessage();
+					}
+				}
+				break;
+
+			case Commands.YES:
+				if (shutdown.getShutdownFlag()){
+					shutdown.setShutdownSaveFlag(true);
+					result = Save.process(ram);
+					System.out.println(result);
+					shutdown.exit();
+				}
+				break;
+
+			case Commands.NO:
+				if (shutdown.getShutdownFlag()){
+					shutdown.exit();
 				}
 				break;
 				
@@ -66,13 +120,22 @@ public class Processor {
 				break;
 				
 			case Commands.SHUTDOWN:
-				System.out.println("Good bye!");
-				System.exit(0);
+				shutdown.setShutdownFlag(true);				
+				result = shutdown.getSaveYesNoMessage();
+				break;
+
+			default:
+				if (shutdown.getShutdownFlag()){
+					result = shutdown.getSaveYesNoMessage();
+				}
+				else{
+					result = "You do not entered any comand";
+				}
+				break;
 			}
 			return result;
 		} else {
 			return "You do not entered any comand";
 		}
 	}
-
 }

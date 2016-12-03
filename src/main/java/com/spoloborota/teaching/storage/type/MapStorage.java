@@ -39,4 +39,21 @@ public class MapStorage {
 
 		return s1;
 	}
+	public String getDataToSave(){
+		StringBuilder preparedBuffer = new StringBuilder();
+		Iterator<HashMap.Entry<String, String>> iterator = hashMap.entrySet().iterator();
+
+		while (iterator.hasNext())
+		{
+			HashMap.Entry<String, String> pair = iterator.next();
+			String key = pair.getKey();
+			String value = pair.getValue();
+			preparedBuffer.append(key);
+			preparedBuffer.append("\r\n");
+			preparedBuffer.append(value);
+			preparedBuffer.append("\r\n");
+		}
+		return preparedBuffer.toString();
+	}
+	
 }
